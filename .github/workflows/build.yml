@@ -1,4 +1,4 @@
-name: 🏗️ Build SemeloOS ISO
+name: Build SemeloOS ISO
 
 on:
   push:
@@ -7,67 +7,69 @@ on:
 
 jobs:
   build-iso:
-    name: 🔨 Build SemeloOS
+    name: Build SemeloOS
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
       options: --privileged
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🔑 Initialize pacman keyring
+      - name: Initialize pacman keyring
         run: |
           pacman-key --init
           pacman-key --populate archlinux
 
-      - name: 📦 Update system & install archiso
+      - name: Update system and install archiso
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm archiso grub syslinux git
 
-      - name: 📁 Copy bootloader configs from archiso releng profile
+      - name: Build SemeloOS profile from releng base
         run: |
-          cp -r /usr/share/archiso/configs/releng/syslinux semelo-profile/syslinux
-          cp -r /usr/share/archiso/configs/releng/grub semelo-profile/grub
-          echo "✅ Bootloader configs copied"
-          ls semelo-profile/
+          # ── Step 1: Copy COMPLETE releng profile (proven bootable base)
+          cp -r /usr/share/archiso/configs/releng/ /tmp/semelo-profile
 
-      - name: "🔗 Pre-build: Setup systemd symlinks & root access"
-        run: |
-          # Enable NetworkManager and spoofer via symlinks
-          # (replaces customize_airootfs.sh which is deprecated in archiso 69+)
-          mkdir -p semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants
+          # ── Step 2: Replace packages with SemeloOS list
+          cp semelo-profile/packages.x86_64 /tmp/semelo-profile/packages.x86_64
+
+          # ── Step 3: Replace profiledef (custom name, label, version)
+          cp semelo-profile/profiledef.sh /tmp/semelo-profile/profiledef.sh
+
+          # ── Step 4: Overlay our airootfs customizations on top of releng
+          cp -r semelo-profile/airootfs/. /tmp/semelo-profile/airootfs/
+
+          # ── Step 5: Setup systemd service symlinks
+          mkdir -p /tmp/semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants
           ln -sf /usr/lib/systemd/system/NetworkManager.service \
-            semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+            /tmp/semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
           ln -sf /etc/systemd/system/semelo-spoof.service \
-            semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/semelo-spoof.service
-          echo "✅ Symlinks created:"
-          ls -la semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/
+            /tmp/semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/semelo-spoof.service
 
-          # Root unlock service (runs at boot to allow root login without password)
-          mkdir -p semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants
+          mkdir -p /tmp/semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants
           ln -sf /etc/systemd/system/semelo-root-unlock.service \
-            semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants/semelo-root-unlock.service
-          echo "✅ Pre-build setup complete"
+            /tmp/semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants/semelo-root-unlock.service
 
-          # Force correct mkinitcpio.conf (belt & suspenders)
-          echo 'MODULES=()' > semelo-profile/airootfs/etc/mkinitcpio.conf
-          echo 'BINARIES=()' >> semelo-profile/airootfs/etc/mkinitcpio.conf
-          echo 'FILES=()' >> semelo-profile/airootfs/etc/mkinitcpio.conf
-          echo 'HOOKS=(base systemd archiso sd-vconsole modconf kms block filesystems)' >> semelo-profile/airootfs/etc/mkinitcpio.conf
-          echo "✅ mkinitcpio.conf overridden:"
-          cat semelo-profile/airootfs/etc/mkinitcpio.conf
+          # ── Step 6: DO NOT override mkinitcpio.conf - let releng handle it
+          # releng uses mkinitcpio-archiso which adds the archiso hook via drop-in
+          rm -f /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
 
-      - name: 🔨 Build SemeloOS ISO
+          # ── Step 7: Show final profile structure
+          echo "=== Final profile ==="
+          ls /tmp/semelo-profile/
+          echo "=== airootfs/etc/systemd/system/multi-user.target.wants ==="
+          ls /tmp/semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/ 2>/dev/null || echo "(empty)"
+
+      - name: Build ISO
         run: |
           mkdir -p /tmp/work /tmp/out
-          mkarchiso -v -w /tmp/work -o /tmp/out ./semelo-profile
-          echo "✅ Build complete!"
+          mkarchiso -v -w /tmp/work -o /tmp/out /tmp/semelo-profile
+          echo "Build complete!"
           ls -lh /tmp/out/
 
-      - name: 📤 Upload ISO Artifact
+      - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
         with:
           name: semelo-os-build-${{ github.run_number }}
