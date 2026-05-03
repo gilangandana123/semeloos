@@ -39,14 +39,12 @@ macchanger
 xorg-server
 xorg-xinit
 xorg-xrandr
-xf86-video-vmware
 xf86-video-vesa
 xf86-input-libinput
 mesa
 
 # --- Window Manager (Minimal) ---
 openbox
-obconf
 picom
 
 # --- Browser ---
