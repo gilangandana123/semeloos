@@ -1,0 +1,11 @@
+# SemeloOS - .gitignore
+
+# Build artifacts
+*.iso
+*.img
+work/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db

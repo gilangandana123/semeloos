@@ -1,0 +1,7 @@
+# SemeloOS - Systemd services enablement
+# This file tells archiso which services to enable
+
+systemd.services=(
+  NetworkManager
+  semelo-spoof
+)

@@ -1,0 +1,43 @@
+name: 🏗️ Build SemeloOS ISO
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    name: 🔨 Build SemeloOS
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+      options: --privileged
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔑 Initialize pacman keyring
+        run: |
+          pacman-key --init
+          pacman-key --populate archlinux
+
+      - name: 📦 Update system & install archiso
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm archiso git
+
+      - name: 🔨 Build SemeloOS ISO
+        run: |
+          mkdir -p /tmp/work /tmp/out
+          mkarchiso -v -w /tmp/work -o /tmp/out ./semelo-profile
+          echo "✅ Build complete!"
+          ls -lh /tmp/out/
+
+      - name: 📤 Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: semelo-os-build-${{ github.run_number }}
+          path: /tmp/out/*.iso
+          retention-days: 7
+          compression-level: 0

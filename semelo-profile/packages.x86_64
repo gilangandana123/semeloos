@@ -1,0 +1,77 @@
+# =============================================
+# SemeloOS - packages.x86_64
+# Package list for the live ISO
+# =============================================
+
+# --- Base System ---
+base
+linux
+linux-headers
+linux-firmware
+mkinitcpio
+mkinitcpio-archiso
+bash
+sudo
+shadow
+
+# --- Boot ---
+grub
+efibootmgr
+syslinux
+memtest86+
+intel-ucode
+amd-ucode
+
+# --- Network ---
+networkmanager
+network-manager-applet
+iproute2
+iputils
+wireless_tools
+wpa_supplicant
+curl
+wget
+
+# --- Hardware Spoofing Tools (User-Space) ---
+macchanger
+
+# --- Display Server ---
+xorg-server
+xorg-xinit
+xorg-xrandr
+xf86-video-vmware
+xf86-video-vesa
+xf86-input-libinput
+mesa
+
+# --- Window Manager (Minimal) ---
+openbox
+obconf
+picom
+
+# --- Browser ---
+chromium
+
+# --- Fonts ---
+ttf-dejavu
+noto-fonts
+noto-fonts-emoji
+
+# --- Audio ---
+pipewire
+pipewire-pulse
+wireplumber
+alsa-utils
+
+# --- Utilities ---
+xterm
+htop
+bash-completion
+which
+file
+tree
+zip
+unzip
+
+# --- Archiving/SquashFS Tools ---
+squashfs-tools

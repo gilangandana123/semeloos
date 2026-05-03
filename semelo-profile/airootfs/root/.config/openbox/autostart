@@ -1,0 +1,34 @@
+#!/bin/bash
+# SemeloOS - Openbox Autostart
+# Runs when Openbox starts, launches Chrome as the only app
+
+# Set wallpaper to solid dark color (no feh needed)
+xsetroot -solid "#0d0d0f"
+
+# Wait for compositor to initialize
+sleep 0.5
+
+# Launch Chromium in full window mode
+chromium \
+    --no-first-run \
+    --disable-infobars \
+    --no-default-browser-check \
+    --disable-extensions \
+    --disable-sync \
+    --no-crash-upload \
+    --disable-background-networking \
+    --disable-background-timer-throttling \
+    --disable-backgrounding-occluded-windows \
+    --disable-breakpad \
+    --disable-client-side-phishing-detection \
+    --disable-default-apps \
+    --disable-dev-shm-usage \
+    --disable-features=TranslateUI \
+    --disable-hang-monitor \
+    --disable-popup-blocking \
+    --disable-prompt-on-repost \
+    --disable-renderer-backgrounding \
+    --no-pings \
+    --password-store=basic \
+    --use-fake-ui-for-media-stream \
+    --start-maximized &
