@@ -52,6 +52,16 @@ jobs:
             semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants/semelo-root-unlock.service
           echo "✅ Pre-build setup complete"
 
+          # Force correct mkinitcpio.conf (belt & suspenders)
+          cat > semelo-profile/airootfs/etc/mkinitcpio.conf << 'EOF'
+MODULES=()
+BINARIES=()
+FILES=()
+HOOKS=(base systemd archiso sd-vconsole modconf kms block filesystems)
+EOF
+          echo "✅ mkinitcpio.conf overridden:"
+          cat semelo-profile/airootfs/etc/mkinitcpio.conf
+
       - name: 🔨 Build SemeloOS ISO
         run: |
           mkdir -p /tmp/work /tmp/out
