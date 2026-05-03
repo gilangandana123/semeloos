@@ -1,0 +1,13 @@
+[Unit]
+Description=SemeloOS - Unlock Root Account for Live Session
+DefaultDependencies=no
+After=local-fs.target
+Before=getty.target console-getty.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/passwd -d root
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

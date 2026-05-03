@@ -9,7 +9,9 @@ xsetroot -solid "#0d0d0f"
 sleep 0.5
 
 # Launch Chromium in full window mode
+# Note: --no-sandbox required when running as root
 chromium \
+    --no-sandbox \
     --no-first-run \
     --disable-infobars \
     --no-default-browser-check \

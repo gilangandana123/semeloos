@@ -34,6 +34,24 @@ jobs:
           echo "✅ Bootloader configs copied"
           ls semelo-profile/
 
+      - name: 🔗 Pre-build: Setup systemd symlinks & root access
+        run: |
+          # Enable NetworkManager and spoofer via symlinks
+          # (replaces customize_airootfs.sh which is deprecated in archiso 69+)
+          mkdir -p semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants
+          ln -sf /usr/lib/systemd/system/NetworkManager.service \
+            semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+          ln -sf /etc/systemd/system/semelo-spoof.service \
+            semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/semelo-spoof.service
+          echo "✅ Symlinks created:"
+          ls -la semelo-profile/airootfs/etc/systemd/system/multi-user.target.wants/
+
+          # Root unlock service (runs at boot to allow root login without password)
+          mkdir -p semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants
+          ln -sf /etc/systemd/system/semelo-root-unlock.service \
+            semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants/semelo-root-unlock.service
+          echo "✅ Pre-build setup complete"
+
       - name: 🔨 Build SemeloOS ISO
         run: |
           mkdir -p /tmp/work /tmp/out

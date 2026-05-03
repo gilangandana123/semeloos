@@ -10,13 +10,12 @@ xset s off
 xset -dpms
 xset s noblank
 
-# Start compositor (light transparency/shadow effects)
+# Start compositor (xrender backend - compatible with VMware)
 picom --daemon --config /dev/null \
-    --backend glx \
-    --vsync \
+    --backend xrender \
     --shadow \
-    --shadow-radius 10 \
-    --shadow-opacity 0.5 &
+    --shadow-radius 8 \
+    --shadow-opacity 0.4 &
 
 # Launch Openbox window manager
 exec openbox-session
