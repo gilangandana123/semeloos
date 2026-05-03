@@ -34,7 +34,7 @@ jobs:
           echo "✅ Bootloader configs copied"
           ls semelo-profile/
 
-      - name: 🔗 Pre-build: Setup systemd symlinks & root access
+      - name: "🔗 Pre-build: Setup systemd symlinks & root access"
         run: |
           # Enable NetworkManager and spoofer via symlinks
           # (replaces customize_airootfs.sh which is deprecated in archiso 69+)
