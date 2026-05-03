@@ -61,7 +61,14 @@ jobs:
           echo 'HOOKS=(base systemd archiso sd-vconsole modconf kms block filesystems)' >> /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
           echo "=== Final mkinitcpio.conf ===" && cat /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
 
-          # ── Step 7: Show final profile structure
+          # ── Step 7: Unlock root account (write shadow with empty password)
+          # This file is overlaid OVER pacstrap's shadow, so root gets no password
+          echo 'root::19000:0:99999:7:::' > /tmp/semelo-profile/airootfs/etc/shadow
+          chmod 400 /tmp/semelo-profile/airootfs/etc/shadow
+          echo "=== root shadow entry ==="
+          cat /tmp/semelo-profile/airootfs/etc/shadow
+
+          # ── Step 8: Show final profile structure
           echo "=== Final profile ==="
           ls /tmp/semelo-profile/
           echo "=== airootfs/etc/systemd/system/multi-user.target.wants ==="
