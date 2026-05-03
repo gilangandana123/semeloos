@@ -42,7 +42,6 @@ xorg-xrandr
 xorg-xsetroot
 xf86-video-vesa
 xf86-video-fbdev
-xf86-video-vmware
 xf86-input-libinput
 mesa
 
