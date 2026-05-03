@@ -52,9 +52,14 @@ jobs:
           ln -sf /etc/systemd/system/semelo-root-unlock.service \
             /tmp/semelo-profile/airootfs/etc/systemd/system/sysinit.target.wants/semelo-root-unlock.service
 
-          # ── Step 6: DO NOT override mkinitcpio.conf - let releng handle it
-          # releng uses mkinitcpio-archiso which adds the archiso hook via drop-in
-          rm -f /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
+          # ── Step 6: Verify mkinitcpio.conf has archiso hook (CRITICAL for live boot!)
+          echo "=== mkinitcpio.conf ===" && cat /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf || true
+          # If missing, write it explicitly
+          echo 'MODULES=()' > /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
+          echo 'BINARIES=()' >> /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
+          echo 'FILES=()' >> /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
+          echo 'HOOKS=(base systemd archiso sd-vconsole modconf kms block filesystems)' >> /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
+          echo "=== Final mkinitcpio.conf ===" && cat /tmp/semelo-profile/airootfs/etc/mkinitcpio.conf
 
           # ── Step 7: Show final profile structure
           echo "=== Final profile ==="
