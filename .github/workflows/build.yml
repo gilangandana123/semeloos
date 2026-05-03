@@ -25,7 +25,14 @@ jobs:
       - name: 📦 Update system & install archiso
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm archiso git
+          pacman -S --noconfirm archiso grub syslinux git
+
+      - name: 📁 Copy bootloader configs from archiso releng profile
+        run: |
+          cp -r /usr/share/archiso/configs/releng/syslinux semelo-profile/syslinux
+          cp -r /usr/share/archiso/configs/releng/grub semelo-profile/grub
+          echo "✅ Bootloader configs copied"
+          ls semelo-profile/
 
       - name: 🔨 Build SemeloOS ISO
         run: |
